@@ -1,3 +1,4 @@
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -13,11 +14,14 @@ class VideoPlayerClass extends StatefulWidget {
 class _VideoPlayerClassState extends State<VideoPlayerClass> {
 
   VideoPlayerController _controller;
+  ChewieController _chewieController;
+  Chewie _playerWidget;
 
   @override
   void dispose() {
     print("_VideoPlayerClassState dispose()");
     _controller.dispose();
+    _chewieController.dispose();
     super.dispose();
   }
 
@@ -30,27 +34,36 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
       });
+
+    _chewieController = ChewieController(
+      videoPlayerController: _controller,
+      autoPlay: true,
+      looping: true,
+    );
+
+    _controller.initialize();
+    _playerWidget = Chewie(
+      controller: _chewieController,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-          child: AspectRatio(
-            aspectRatio: _controller.value.aspectRatio,
-            child: VideoPlayer(_controller),
+      body:Container(
+        child: Center(
+          child: _chewieController != null &&
+              _chewieController.videoPlayerController.value.initialized
+              ? Chewie(
+            controller: _chewieController,
           )
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _controller.value.isPlaying
-                ? _controller.pause()
-                : _controller.play();
-          });
-        },
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+              : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );
