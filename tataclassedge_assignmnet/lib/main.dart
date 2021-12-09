@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'VideoPlayer.dart';
+
 void main() {
   runApp(MyApp());
 }
@@ -29,7 +31,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List listOfTopics = ['English', 'Maths', 'Science', 'History', 'Geography'];
-
+  List listOfVideoUrl = [
+                      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+                      "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+                    ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 title:Text(listOfTopics[index]),
                 onTap: (){
                   print(index);
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerClass(videoUrl: listOfVideoUrl[index],)));
                 },
             );
           },
