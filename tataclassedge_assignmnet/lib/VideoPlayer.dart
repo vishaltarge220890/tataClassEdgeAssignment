@@ -2,6 +2,8 @@ import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+import 'QuizClass.dart';
+
 
 class VideoPlayerClass extends StatefulWidget {
   VideoPlayerClass({Key key, this.videoUrl}) : super(key: key);
@@ -16,6 +18,7 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
   bool _showingNotes = false;
+  bool _showingQuiz = false;
   List cuePoints = [15, 30]; // Cue-points are hardcoded as of now
   List listOfNotes = [];
 
@@ -54,6 +57,14 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
         if(_showingNotes == false)
           showNotesDialog();
       }
+
+      if (_videoPlayerController.value.position.inSeconds == _videoPlayerController.value.duration.inSeconds) {
+        if(_showingQuiz == false){
+          _showingQuiz = true;
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizClass()));
+        }
+      }
+
     });
   }
 
