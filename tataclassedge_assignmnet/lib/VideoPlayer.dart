@@ -61,7 +61,7 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
       if (_videoPlayerController.value.position.inSeconds == _videoPlayerController.value.duration.inSeconds) {
         if(_showingQuiz == false){
           _showingQuiz = true;
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => QuizClass()));
+          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => QuizClass()));
         }
       }
 

@@ -2,6 +2,8 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:quiz_view/quiz_view.dart';
 
+import 'Summary.dart';
+
 class QuizClass extends StatefulWidget {
   QuizClass({Key key}) : super(key: key);
 
@@ -13,6 +15,7 @@ class _QuizClassState extends State<QuizClass> {
   int questionNumber = 1;
   bool showMessage = false;
   bool isAnswerCorrect = false;
+  List summaryList = [];
 
   List listOfQuestions = [
     'Brass gets discoloured in air because of the presence of which of the following gases in air?',
@@ -80,20 +83,27 @@ class _QuizClassState extends State<QuizClass> {
   void handleRightAnswer() {
     showMessage = true;
     isAnswerCorrect = true;
-
+    summaryList.add(true);
     if(questionNumber < 5) {
       setState(() {
         questionNumber += 1;
       });
     } else {
-
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SummaryClass(summaryList: summaryList,)));
     }
   }
 
   void handleWrongAnswer() {
+    summaryList.add(false);
     showMessage = true;
     isAnswerCorrect = false;
-    setState(() {});
+    if(questionNumber < 5) {
+      setState(() {
+        questionNumber += 1;
+      });
+    } else {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => SummaryClass(summaryList: summaryList,)));
+    }
   }
 
   Widget showCorrectMessage(){
