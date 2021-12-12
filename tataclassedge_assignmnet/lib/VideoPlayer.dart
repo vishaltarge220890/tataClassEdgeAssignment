@@ -16,11 +16,13 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
   VideoPlayerController _videoPlayerController;
   ChewieController _chewieController;
   bool _showingNotes = false;
-  TextEditingController _textEditingController = TextEditingController();
+  List cuePoints = [15, 30]; // Cue-points are hardcoded as of now
+  List listOfNotes = [];
 
   @override
   void dispose() {
     print("_VideoPlayerClassState dispose()");
+    _videoPlayerController.removeListener(() {});
     _videoPlayerController.dispose();
     _chewieController.dispose();
     super.dispose();
@@ -29,6 +31,10 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
   @override
   void initState() {
     super.initState();
+    initializeVideoPlayerController();
+  }
+
+  void initializeVideoPlayerController(){
     _videoPlayerController = VideoPlayerController.network(
         "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4")
       ..initialize().then((_) {
@@ -39,17 +45,16 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
     _chewieController = ChewieController(
       videoPlayerController: _videoPlayerController,
       autoPlay: true,
-      looping: true,
     );
 
     _videoPlayerController.initialize();
     _videoPlayerController.addListener(() {
-      if(_videoPlayerController.value.position.inSeconds == 3) {
+      //Check if cue-points reached if yes then show notes
+      if(cuePoints.contains(_videoPlayerController.value.position.inSeconds)) {
         if(_showingNotes == false)
           showNotesDialog();
       }
     });
-
   }
 
   @override
@@ -108,6 +113,8 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
   }
 
   Widget getNotesColumn() {
+    _chewieController.pause();
+    TextEditingController textEditingController = TextEditingController();
     return Material(
       child: Container(
         child: Column(
@@ -126,6 +133,10 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
                 IconButton(icon: Icon(Icons.cancel, size: 30, color: Colors.grey,), onPressed: (){
                   if (Navigator.canPop(context)) {
                     Navigator.pop(context);
+                    Future.delayed(const Duration(seconds: 1), () {
+                      _chewieController.play();
+                      _showingNotes = false;
+                    });
                   }
                 }),
               ],
@@ -136,7 +147,7 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
               child: TextField(
                   keyboardType: TextInputType.multiline,
                   maxLines: 50,
-                  controller: _textEditingController,
+                  controller: textEditingController,
                   decoration: InputDecoration(
                     hintText: 'Insert text here...',
                     hintStyle: TextStyle(
@@ -158,8 +169,15 @@ class _VideoPlayerClassState extends State<VideoPlayerClass> {
             Padding(
               padding: const EdgeInsets.only(left: 25, bottom: 20),
               child: InkWell(onTap: () {
-                if (_textEditingController.text.isNotEmpty && Navigator.canPop(context)) {
+                if (textEditingController.text.isNotEmpty && Navigator.canPop(context)) {
+                  listOfNotes.add(textEditingController.text);
+                  print(listOfNotes);
+                  textEditingController.text = "";
                   Navigator.pop(context);
+                  Future.delayed(const Duration(seconds: 1), () {
+                    _chewieController.play();
+                    _showingNotes = false;
+                  });
                 }
               },
                   child: Text('SAVE NOTE', style: TextStyle(
